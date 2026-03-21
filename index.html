@@ -1,0 +1,1430 @@
+<!-- Claudio Cotea-->
+
+<!DOCTYPE html>
+<html lang="it" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Productivity Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+<style>
+  /* ── CSS VARIABLES ── */
+  :root {
+    --bg-base:    #0e0907;
+    --bg-surface: #160c09;
+    --bg-card:    #1e110d;
+    --bg-hover:   #271610;
+    --border:     #3a1f15;
+    --border-lit: #4e2a1c;
+    --accent:     #f97316;
+    --accent2:    #ef4444;
+    --accent-dim: #7c2d12;
+    --accent-glow:rgba(249,115,22,.15);
+    --grad:       linear-gradient(135deg, #f97316 0%, #ef4444 100%);
+    --grad-v:     linear-gradient(180deg,  #f97316 0%, #ef4444 100%);
+    --grad-text:  linear-gradient(90deg,   #f97316 0%, #ef4444 100%);
+    --grad-border:linear-gradient(135deg, #f97316, #ef4444);
+    --text-primary:  #f7ede8;
+    --text-secondary:#a08070;
+    --text-muted:    #5c3a2e;
+    --green:  #34d399;
+    --red:    #f87171;
+    --blue:   #60a5fa;
+    --purple: #a78bfa;
+    --pink:   #f472b6;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-display: 'Syne', sans-serif;
+    --radius: 8px;
+    --sidebar-w: 220px;
+    --transition: .18s cubic-bezier(.4,0,.2,1);
+  }
+  .light {
+    --bg-base:    #fef5f0;
+    --bg-surface: #fdeee6;
+    --bg-card:    #fae3d8;
+    --bg-hover:   #f5d5c5;
+    --border:     #e8c4b0;
+    --border-lit: #d9b09a;
+    --accent:     #f97316;
+    --accent2:    #ef4444;
+    --accent-dim: #fecba8;
+    --accent-glow:rgba(249,115,22,.10);
+    --text-primary:  #1a0c08;
+    --text-secondary:#6a3c2c;
+    --text-muted:    #b08878;
+  }
+
+  /* ── GRADIENT TEXT UTILITY ── */
+  .grad-text {
+    background: var(--grad-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  /* ── GRADIENT BORDER UTILITY ── */
+  .grad-border {
+    border: 1.5px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+  .grad-border::before {
+    content: '';
+    position: absolute;
+    inset: -1.5px;
+    border-radius: inherit;
+    background: var(--grad-border);
+    z-index: -1;
+    opacity: .5;
+  }
+
+  /* ── RESET ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: var(--font-mono);
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-size: 13px;
+    line-height: 1.6;
+    transition: background var(--transition), color var(--transition);
+  }
+  button { cursor: pointer; font-family: inherit; border: none; background: none; color: inherit; }
+  input, textarea {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    outline: none;
+  }
+  [contenteditable]:focus { outline: none; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 2px; }
+
+  /* ── LAYOUT ── */
+  #app { display: flex; height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    position: relative;
+    z-index: 10;
+    transition: background var(--transition);
+  }
+  .sidebar-logo {
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .sidebar-logo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--grad);
+    opacity: .06;
+    pointer-events: none;
+  }
+  .sidebar-logo .logo-mark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -.4px;
+    background: var(--grad-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-heart {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    animation: heartbeat 1.4s ease-in-out infinite;
+    -webkit-text-fill-color: initial;
+    filter: drop-shadow(0 0 5px rgba(239,68,68,.6));
+  }
+  @keyframes heartbeat {
+    0%,100% { transform: scale(1); }
+    14%      { transform: scale(1.22); }
+    28%      { transform: scale(1); }
+    42%      { transform: scale(1.14); }
+    56%      { transform: scale(1); }
+  }
+  .logo-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--grad);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse-dot 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse-dot {
+    0%,100% { box-shadow: 0 0 4px var(--accent); }
+    50%      { box-shadow: 0 0 14px var(--accent2); }
+  }
+  .sidebar-logo .sub {
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+  .logo-dedication {
+    margin-top: 10px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    background: rgba(239,68,68,.08);
+    border: 1px solid rgba(239,68,68,.2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: var(--text-secondary);
+    letter-spacing: .3px;
+  }
+  .logo-dedication .ded-heart {
+    font-size: 11px;
+    filter: drop-shadow(0 0 4px rgba(239,68,68,.7));
+    animation: heartbeat 1.4s ease-in-out infinite;
+  }
+  .logo-dedication strong {
+    background: var(--grad-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+  }
+  .nav-section {
+    padding: 12px 10px 4px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .nav-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0 8px;
+    margin-bottom: 6px;
+    margin-top: 8px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: var(--radius);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition);
+    position: relative;
+    font-size: 12.5px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .nav-item.active {
+    background: var(--accent-glow);
+    color: var(--accent);
+    border: 1px solid rgba(249,115,22,.25);
+  }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 20%; bottom: 20%;
+    width: 3px;
+    background: var(--grad-v);
+    border-radius: 0 3px 3px 0;
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+  /* bottom actions */
+  .sidebar-footer {
+    border-top: 1px solid var(--border);
+    padding: 12px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .time-display {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .toggle-dark {
+    width: 36px; height: 20px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-lit);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background var(--transition);
+  }
+  .toggle-dark.on { background: var(--accent-dim); border-color: var(--accent); }
+  .toggle-dark .knob {
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    transition: transform var(--transition), background var(--transition);
+  }
+  .toggle-dark.on .knob { transform: translateX(16px); background: var(--accent); }
+
+  /* ── MAIN AREA ── */
+  #main {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .topbar {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-surface);
+    transition: background var(--transition);
+    position: relative;
+  }
+  .topbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--grad);
+    opacity: .5;
+  }
+  .topbar-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+  }
+  .topbar-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+  .content-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  /* ── CALENDAR ── */
+  .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .cal-month-label {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .cal-nav-btn {
+    width: 32px; height: 32px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary);
+    transition: all var(--transition);
+  }
+  .cal-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+  .cal-day-label {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 8px 0;
+  }
+  .cal-cell {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 6px 4px 4px;
+    cursor: pointer;
+    transition: all var(--transition);
+    position: relative;
+    min-height: 52px;
+    background: var(--bg-card);
+  }
+  .cal-cell:hover { border-color: var(--border-lit); background: var(--bg-hover); }
+  .cal-cell.today { border-color: var(--accent); background: var(--accent-glow); }
+  .cal-cell.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .cal-cell.other-month .cal-day-num { color: var(--text-muted); }
+  .cal-day-num {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .cal-cell.today .cal-day-num { color: var(--accent); }
+  .event-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin: 1px 0;
+  }
+  .event-dot.blue  { background: var(--blue); }
+  .event-dot.green { background: var(--green); }
+  .event-dot.red   { background: var(--red); }
+
+  /* event panel */
+  .event-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 16px;
+  }
+  .event-panel-title {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .event-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .event-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    background: var(--bg-surface);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    animation: slideIn .15s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .event-color-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .event-item-text { flex: 1; font-size: 12px; }
+  .event-delete {
+    color: var(--text-muted);
+    padding: 2px;
+    border-radius: 4px;
+    transition: color var(--transition);
+  }
+  .event-delete:hover { color: var(--red); }
+  .event-add-row {
+    display: flex; gap: 8px;
+  }
+  .event-input {
+    flex: 1;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 12px;
+    color: var(--text-primary);
+    transition: border-color var(--transition);
+  }
+  .event-input:focus { border-color: var(--accent); }
+  .color-picker { display: flex; gap: 4px; align-items: center; }
+  .color-swatch {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform var(--transition);
+  }
+  .color-swatch:hover { transform: scale(1.2); }
+  .color-swatch.selected { border-color: var(--text-primary); }
+  .btn-primary {
+    background: var(--grad);
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    transition: opacity var(--transition), transform var(--transition);
+    white-space: nowrap;
+    border: none;
+  }
+  .btn-primary:hover { opacity: .88; transform: scale(1.02); }
+
+  /* ── FOCUS TIMER ── */
+  .timer-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 0 16px;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  .timer-mode-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 3px;
+    margin-bottom: 32px;
+  }
+  .timer-tab {
+    padding: 6px 18px;
+    border-radius: 5px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    transition: all var(--transition);
+    font-weight: 600;
+  }
+  .timer-tab.active {
+    background: var(--accent);
+    color: #0d0d0f;
+  }
+  .timer-ring-container {
+    position: relative;
+    width: 220px; height: 220px;
+    margin-bottom: 32px;
+  }
+  .timer-svg { transform: rotate(-90deg); }
+  .timer-track { fill: none; stroke: var(--bg-card); stroke-width: 8; }
+  .timer-progress {
+    fill: none;
+    stroke: url(#timerGrad);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear;
+    filter: drop-shadow(0 0 8px rgba(249,115,22,.6));
+  }
+  .timer-progress.break-mode { stroke: var(--green); filter: drop-shadow(0 0 8px var(--green)); }
+  .timer-inner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .timer-digits {
+    font-family: var(--font-display);
+    font-size: 46px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    background: var(--grad-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .timer-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+  .timer-controls { display: flex; gap: 12px; }
+  .timer-btn {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: 1px solid var(--border-lit);
+    background: var(--bg-card);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-primary);
+    transition: all var(--transition);
+  }
+  .timer-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+  .timer-btn.primary-btn {
+    width: 64px; height: 64px;
+    background: var(--grad);
+    border: none;
+    color: #fff;
+    box-shadow: 0 0 24px rgba(249,115,22,.35);
+  }
+  .timer-btn.primary-btn:hover { opacity: .9; transform: scale(1.04); }
+  .timer-sessions {
+    margin-top: 24px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .session-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-lit);
+    transition: all var(--transition);
+  }
+  .session-dot.done { background: var(--grad); border-color: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .session-label { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; margin-left: 4px; }
+  .session-count-text { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+
+  /* ── TODO ── */
+  .todo-add-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .todo-input {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text-primary);
+    transition: border-color var(--transition);
+  }
+  .todo-input:focus { border-color: var(--accent); }
+  .todo-section-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .todo-count-badge {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 10px;
+    color: var(--text-secondary);
+  }
+  .todo-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px; }
+  .todo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: all var(--transition);
+    animation: slideIn .18s ease;
+  }
+  .todo-item:hover { border-color: var(--border-lit); }
+  .todo-item.completed {
+    opacity: .5;
+    border-color: transparent;
+  }
+  .todo-check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-lit);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition);
+    color: transparent;
+    font-size: 10px;
+  }
+  .todo-check:hover { border-color: var(--green); color: var(--green); }
+  .todo-check.checked {
+    background: var(--green);
+    border-color: var(--green);
+    color: #0d0d0f;
+  }
+  .todo-text { flex: 1; font-size: 13px; }
+  .todo-text.strike { text-decoration: line-through; color: var(--text-muted); }
+  .todo-delete {
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity var(--transition);
+    padding: 2px;
+  }
+  .todo-item:hover .todo-delete { opacity: 1; }
+  .todo-delete:hover { color: var(--red); }
+  .todo-priority {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .todo-empty {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-muted);
+    font-size: 12px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+  }
+
+  /* ── STICKY NOTES ── */
+  .notes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .sticky-card {
+    border-radius: 10px;
+    padding: 14px;
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border: 1px solid rgba(0,0,0,.1);
+    box-shadow: 0 4px 16px rgba(0,0,0,.18);
+    transition: transform var(--transition), box-shadow var(--transition);
+    animation: noteAppear .2s ease;
+  }
+  @keyframes noteAppear {
+    from { opacity: 0; transform: scale(.95) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .sticky-card:hover {
+    transform: translateY(-3px) rotate(.4deg);
+    box-shadow: 0 8px 28px rgba(0,0,0,.24);
+  }
+  .sticky-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  .note-swatch {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid rgba(0,0,0,.15);
+    transition: transform var(--transition);
+    flex-shrink: 0;
+  }
+  .note-swatch:hover { transform: scale(1.3); }
+  .note-swatch.active { border-color: rgba(0,0,0,.4); transform: scale(1.2); }
+  .note-delete-btn {
+    margin-left: auto;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.12);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(0,0,0,.5);
+    transition: all var(--transition);
+    font-size: 12px;
+  }
+  .note-delete-btn:hover { background: rgba(0,0,0,.25); color: rgba(0,0,0,.8); }
+  .note-content {
+    flex: 1;
+    resize: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: rgba(0,0,0,.75);
+    width: 100%;
+    min-height: 100px;
+  }
+  .note-content::placeholder { color: rgba(0,0,0,.3); }
+  .note-timestamp {
+    font-size: 9px;
+    color: rgba(0,0,0,.35);
+    margin-top: 8px;
+    letter-spacing: .5px;
+  }
+  .add-note-card {
+    border-radius: 10px;
+    min-height: 160px;
+    border: 2px dashed var(--border-lit);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    color: var(--text-muted);
+    font-size: 12px;
+    gap: 8px;
+  }
+  .add-note-card:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  /* ── OVERVIEW CARDS ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    transition: border-color var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--accent-glow) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity var(--transition);
+  }
+  .stat-card:hover { border-color: var(--accent-dim); }
+  .stat-card:hover::after { opacity: 1; }
+  .stat-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+  .stat-value { font-family: var(--font-display); font-size: 28px; font-weight: 800; }
+  .stat-sub { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+  .stat-icon { position: absolute; top: 14px; right: 14px; opacity: .15; }
+
+  /* ── UTILS ── */
+  .flex { display: flex; }
+  .items-center { align-items: center; }
+  .gap-2 { gap: 8px; }
+  .hidden { display: none; }
+  svg.icon { width: 15px; height: 15px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- ══ SIDEBAR ══ -->
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <span class="logo-dot"></span>
+        PRODUX
+        <span class="logo-heart"></span>
+      </div>
+      <div class="sub">DASHBOARD v2.0</div>
+      <div class="logo-dedication">
+        <span class="ded-heart"></span>
+        <span>Made with love</span>
+      </div>
+    </div>
+
+    <nav class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <div class="nav-item active" data-view="overview">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </div>
+      <div class="nav-item" data-view="calendar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Calendar
+      </div>
+      <div class="nav-item" data-view="timer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Focus Timer
+      </div>
+      <div class="nav-item" data-view="todo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Tasks
+      </div>
+      <div class="nav-item" data-view="notes">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Notes
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="time-display" id="clock">--:--</div>
+      <button class="toggle-dark on" id="darkToggle" title="Toggle dark mode"></button>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div id="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title grad-text" id="topbarTitle">Overview</div>
+        <div class="topbar-meta" id="topbarDate">Loading...</div>
+      </div>
+    </div>
+    <div class="content-area" id="contentArea"></div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   PRODUCTIVITY SERVICE — localStorage + Signals
+   (Equivalent to Angular ProductivityService)
+════════════════════════════════════════════ */
+const Storage = {
+  get: k => { try { return JSON.parse(localStorage.getItem('produx_'+k)); } catch { return null; } },
+  set: (k,v) => { try { localStorage.setItem('produx_'+k, JSON.stringify(v)); } catch {} },
+};
+
+// Simple Signal implementation (analogous to Angular signals)
+function signal(initial) {
+  let _val = initial;
+  const listeners = new Set();
+  return {
+    get value() { return _val; },
+    set(v) { _val = v; listeners.forEach(fn => fn(v)); },
+    subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
+  };
+}
+
+// ── State (Signals) ──
+const darkMode   = signal(Storage.get('darkMode') ?? true);
+const events     = signal(Storage.get('events')   ?? {});   // { 'YYYY-MM-DD': [{text, color}] }
+const todos      = signal(Storage.get('todos')    ?? []);   // [{id, text, done, priority}]
+const notes      = signal(Storage.get('notes')    ?? []);   // [{id, text, color, ts}]
+const timerState = signal({ mode:'focus', running:false, remaining:25*60, sessions:0 });
+
+// Persist on change
+events.subscribe(v => Storage.set('events', v));
+todos.subscribe(v  => Storage.set('todos', v));
+notes.subscribe(v  => Storage.set('notes', v));
+darkMode.subscribe(v => {
+  Storage.set('darkMode', v);
+  document.documentElement.classList.toggle('dark', v);
+  document.documentElement.classList.toggle('light', !v);
+});
+
+// Init dark mode
+document.documentElement.classList.toggle('dark', darkMode.value);
+document.documentElement.classList.toggle('light', !darkMode.value);
+
+// Dark toggle button
+const darkToggle = document.getElementById('darkToggle');
+darkToggle.classList.toggle('on', darkMode.value);
+darkToggle.addEventListener('click', () => {
+  darkMode.set(!darkMode.value);
+  darkToggle.classList.toggle('on', darkMode.value);
+});
+
+/* ════════════════════════════════════════════
+   CLOCK
+════════════════════════════════════════════ */
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+document.getElementById('topbarDate').textContent =
+  new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+
+/* ════════════════════════════════════════════
+   ROUTER — ngSwitch equivalent
+════════════════════════════════════════════ */
+let currentView = 'overview';
+const views = {
+  overview: { title: 'Overview', render: renderOverview },
+  calendar: { title: 'Calendar', render: renderCalendar },
+  timer:    { title: 'Focus Timer', render: renderTimer },
+  todo:     { title: 'Tasks', render: renderTodo },
+  notes:    { title: 'Sticky Notes', render: renderNotes },
+};
+
+function navigate(view) {
+  currentView = view;
+  document.querySelectorAll('.nav-item').forEach(el =>
+    el.classList.toggle('active', el.dataset.view === view));
+  document.getElementById('topbarTitle').textContent = views[view].title;
+  const area = document.getElementById('contentArea');
+  area.innerHTML = '';
+  views[view].render(area);
+}
+
+document.querySelectorAll('.nav-item').forEach(el =>
+  el.addEventListener('click', () => navigate(el.dataset.view)));
+
+/* ════════════════════════════════════════════
+   OVERVIEW COMPONENT
+════════════════════════════════════════════ */
+function renderOverview(root) {
+  const done      = todos.value.filter(t => t.done).length;
+  const active    = todos.value.filter(t => !t.done).length;
+  const noteCount = notes.value.length;
+
+  // Today's events
+  const todayKey  = dateKey(new Date());
+  const todayEvts = (events.value[todayKey] || []).length;
+
+  root.innerHTML = `
+    <div class="overview-grid">
+      <div class="stat-card">
+        <div class="stat-label">Active Tasks</div>
+        <div class="stat-value" style="color:var(--accent)">${active}</div>
+        <div class="stat-sub">${done} completed</div>
+        <svg class="stat-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Today's Events</div>
+        <div class="stat-value" style="color:var(--blue)">${todayEvts}</div>
+        <div class="stat-sub">scheduled today</div>
+        <svg class="stat-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Sticky Notes</div>
+        <div class="stat-value" style="color:var(--pink)">${noteCount}</div>
+        <div class="stat-sub">notes saved</div>
+        <svg class="stat-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pomodoro Sessions</div>
+        <div class="stat-value" style="color:var(--green)">${timerState.value.sessions}</div>
+        <div class="stat-sub">completed today</div>
+        <svg class="stat-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+    </div>
+
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px">
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px">Quick Access</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${['calendar','timer','todo','notes'].map(v=>`
+          <button onclick="navigate('${v}')" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:10px 16px;font-size:12px;color:var(--text-secondary);font-family:var(--font-mono);transition:.18s;cursor:pointer"
+            onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+            onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-secondary)'">
+            ${views[v].title} →
+          </button>`).join('')}
+      </div>
+    </div>`;
+}
+
+/* ════════════════════════════════════════════
+   CALENDAR COMPONENT
+════════════════════════════════════════════ */
+let calDate = new Date();
+let selectedDate = null;
+let newEventColor = '#f59e0b';
+
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function renderCalendar(root) {
+  const year  = calDate.getFullYear();
+  const month = calDate.getMonth();
+  const today = new Date();
+  const todayKey = dateKey(today);
+  const selKey   = selectedDate ? dateKey(selectedDate) : null;
+
+  // Build grid cells
+  const firstDay = new Date(year, month, 1);
+  let startDow = firstDay.getDay(); // 0=Sun
+  startDow = startDow === 0 ? 6 : startDow - 1; // Mon-first
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const daysInPrev  = new Date(year, month, 0).getDate();
+
+  const cells = [];
+  for (let i = startDow - 1; i >= 0; i--) {
+    cells.push({ day: daysInPrev - i, otherMonth: true, date: new Date(year, month-1, daysInPrev-i) });
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ day: d, otherMonth: false, date: new Date(year, month, d) });
+  }
+  while (cells.length % 7 !== 0) {
+    cells.push({ day: cells.length - daysInMonth - startDow + 1, otherMonth: true, date: null });
+  }
+
+  const evMap = events.value;
+
+  const cellsHTML = cells.map(c => {
+    const k = c.date ? dateKey(c.date) : null;
+    const evts = k && evMap[k] ? evMap[k] : [];
+    const isToday = k === todayKey;
+    const isSel   = k === selKey;
+    const dots = evts.slice(0,3).map(e =>
+      `<div class="event-dot" style="background:${e.color}"></div>`).join('');
+    return `<div class="cal-cell ${c.otherMonth?'other-month':''} ${isToday?'today':''} ${isSel?'selected':''}"
+        data-key="${k}" data-date="${c.date ? c.date.toISOString() : ''}">
+      <span class="cal-day-num">${c.day}</span>
+      ${dots}
+    </div>`;
+  }).join('');
+
+  const selEvts = selKey && evMap[selKey] ? evMap[selKey] : [];
+  const swatches = ['#f59e0b','#60a5fa','#34d399','#f87171','#a78bfa'].map(col =>
+    `<div class="color-swatch${col===newEventColor?' selected':''}" style="background:${col}" data-col="${col}"></div>`).join('');
+
+  root.innerHTML = `
+    <div class="cal-header">
+      <button class="cal-nav-btn" id="prevMonth">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="cal-month-label">${MONTHS[month]} ${year}</div>
+      <button class="cal-nav-btn" id="nextMonth">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+    <div class="cal-grid">
+      ${DAYS.map(d=>`<div class="cal-day-label">${d}</div>`).join('')}
+      ${cellsHTML}
+    </div>
+    <div class="event-panel">
+      <div class="event-panel-title">
+        ${selKey ? `Events for ${selectedDate.toLocaleDateString('en-GB',{day:'numeric',month:'long'})}` : 'Select a day'}
+      </div>
+      ${selKey ? `
+        <div class="event-list" id="evtList">
+          ${selEvts.length ? selEvts.map((e,i)=>`
+            <div class="event-item">
+              <div class="event-color-dot" style="background:${e.color}"></div>
+              <span class="event-item-text">${e.text}</span>
+              <button class="event-delete" data-idx="${i}">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>`).join('') : '<div style="font-size:12px;color:var(--text-muted);padding:4px 0">No events. Add one below.</div>'}
+        </div>
+        <div class="event-add-row">
+          <input class="event-input" id="evtInput" placeholder="New event…" />
+          <div class="color-picker">${swatches}</div>
+          <button class="btn-primary" id="addEvtBtn">Add</button>
+        </div>` : '<div style="font-size:12px;color:var(--text-muted)">Click on a day to manage events.</div>'}
+    </div>`;
+
+  // Events
+  root.querySelectorAll('.cal-cell').forEach(el => {
+    el.addEventListener('click', () => {
+      if (!el.dataset.date) return;
+      selectedDate = new Date(el.dataset.date);
+      renderCalendar(root);
+    });
+  });
+  root.getElementById = (id) => root.querySelector('#'+id);
+  root.querySelector('#prevMonth')?.addEventListener('click', () => {
+    calDate = new Date(calDate.getFullYear(), calDate.getMonth()-1, 1);
+    renderCalendar(root);
+  });
+  root.querySelector('#nextMonth')?.addEventListener('click', () => {
+    calDate = new Date(calDate.getFullYear(), calDate.getMonth()+1, 1);
+    renderCalendar(root);
+  });
+  root.querySelectorAll('.color-swatch').forEach(sw => {
+    sw.addEventListener('click', () => { newEventColor = sw.dataset.col; renderCalendar(root); });
+  });
+  root.querySelector('#addEvtBtn')?.addEventListener('click', () => {
+    const inp = root.querySelector('#evtInput');
+    const txt = inp?.value.trim();
+    if (!txt || !selKey) return;
+    const cur = { ...(events.value) };
+    cur[selKey] = [...(cur[selKey]||[]), { text: txt, color: newEventColor }];
+    events.set(cur);
+    renderCalendar(root);
+  });
+  root.querySelector('#evtInput')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') root.querySelector('#addEvtBtn')?.click();
+  });
+  root.querySelectorAll('.event-delete').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.idx);
+      const cur = { ...(events.value) };
+      cur[selKey] = cur[selKey].filter((_,i) => i !== idx);
+      events.set(cur);
+      renderCalendar(root);
+    });
+  });
+}
+
+/* ════════════════════════════════════════════
+   FOCUS TIMER COMPONENT
+════════════════════════════════════════════ */
+let timerInterval = null;
+
+function renderTimer(root) {
+  const s = timerState.value;
+  const total   = s.mode === 'focus' ? 25*60 : 5*60;
+  const ratio   = s.remaining / total;
+  const R       = 96;
+  const circ    = 2 * Math.PI * R;
+  const offset  = circ * (1 - ratio);
+  const mins    = String(Math.floor(s.remaining/60)).padStart(2,'0');
+  const secs    = String(s.remaining % 60).padStart(2,'0');
+  const isBreak = s.mode === 'break';
+
+  const sessionDots = Array.from({length:4}, (_,i) =>
+    `<div class="session-dot${i < s.sessions % 4 ? ' done':''}"></div>`).join('');
+
+  root.innerHTML = `
+    <div class="timer-wrapper">
+      <div class="timer-mode-tabs">
+        <div class="timer-tab${!isBreak?' active':''}" data-mode="focus">Focus</div>
+        <div class="timer-tab${isBreak?' active':''}" data-mode="break">Break</div>
+      </div>
+
+      <div class="timer-ring-container">
+      <svg class="timer-svg" width="220" height="220" viewBox="0 0 220 220">
+          <defs>
+            <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#f97316"/>
+              <stop offset="100%" stop-color="#ef4444"/>
+            </linearGradient>
+          </defs>
+          <circle class="timer-track" cx="110" cy="110" r="${R}"/>
+          <circle class="timer-progress${isBreak?' break-mode':''}" cx="110" cy="110" r="${R}"
+            stroke-dasharray="${circ}"
+            stroke-dashoffset="${offset}"/>
+        </svg>
+        <div class="timer-inner">
+          <div class="timer-digits">${mins}:${secs}</div>
+          <div class="timer-label">${isBreak ? 'BREAK' : 'FOCUS'}</div>
+        </div>
+      </div>
+
+      <div class="timer-controls">
+        <button class="timer-btn" id="timerReset" title="Reset">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.22"/></svg>
+        </button>
+        <button class="timer-btn primary-btn" id="timerPlayPause">
+          ${s.running
+            ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`
+            : `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`}
+        </button>
+        <button class="timer-btn" id="timerSkip" title="Skip">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+        </button>
+      </div>
+
+      <div class="timer-sessions">${sessionDots}<span class="session-label">SESSIONS</span></div>
+      <div class="session-count-text">Total completed: <strong>${s.sessions}</strong></div>
+    </div>`;
+
+  root.querySelectorAll('.timer-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      clearInterval(timerInterval); timerInterval = null;
+      const mode = tab.dataset.mode;
+      timerState.set({ ...timerState.value, mode, running:false, remaining: mode==='focus'?25*60:5*60 });
+      renderTimer(root);
+    });
+  });
+
+  root.querySelector('#timerPlayPause').addEventListener('click', () => {
+    if (timerState.value.running) {
+      clearInterval(timerInterval); timerInterval = null;
+      timerState.set({ ...timerState.value, running: false });
+      renderTimer(root);
+    } else {
+      timerState.set({ ...timerState.value, running: true });
+      timerInterval = setInterval(() => {
+        const st = timerState.value;
+        if (st.remaining <= 0) {
+          clearInterval(timerInterval); timerInterval = null;
+          const nextMode = st.mode === 'focus' ? 'break' : 'focus';
+          const sessions = st.mode === 'focus' ? st.sessions + 1 : st.sessions;
+          timerState.set({ mode: nextMode, running: false, remaining: nextMode==='focus'?25*60:5*60, sessions });
+          renderTimer(root);
+          return;
+        }
+        timerState.set({ ...st, remaining: st.remaining - 1 });
+        // Update display in-place (no full re-render for performance)
+        const mins = String(Math.floor(timerState.value.remaining/60)).padStart(2,'0');
+        const secs = String(timerState.value.remaining % 60).padStart(2,'0');
+        const digits = root.querySelector('.timer-digits');
+        if (digits) digits.textContent = `${mins}:${secs}`;
+        const total2 = st.mode==='focus'?25*60:5*60;
+        const ratio2 = timerState.value.remaining / total2;
+        const circ2  = 2*Math.PI*96;
+        const prog   = root.querySelector('.timer-progress');
+        if (prog) prog.style.strokeDashoffset = circ2 * (1 - ratio2);
+      }, 1000);
+      renderTimer(root);
+    }
+  });
+
+  root.querySelector('#timerReset').addEventListener('click', () => {
+    clearInterval(timerInterval); timerInterval = null;
+    const mode = timerState.value.mode;
+    timerState.set({ ...timerState.value, running: false, remaining: mode==='focus'?25*60:5*60 });
+    renderTimer(root);
+  });
+
+  root.querySelector('#timerSkip').addEventListener('click', () => {
+    clearInterval(timerInterval); timerInterval = null;
+    const st = timerState.value;
+    const nextMode = st.mode === 'focus' ? 'break' : 'focus';
+    const sessions = st.mode === 'focus' ? st.sessions + 1 : st.sessions;
+    timerState.set({ mode: nextMode, running: false, remaining: nextMode==='focus'?25*60:5*60, sessions });
+    renderTimer(root);
+  });
+}
+
+/* ════════════════════════════════════════════
+   TODO COMPONENT
+════════════════════════════════════════════ */
+const PRIORITIES = { high: '#f87171', medium: '#f59e0b', low: '#34d399' };
+
+function renderTodo(root) {
+  const active    = todos.value.filter(t => !t.done);
+  const completed = todos.value.filter(t =>  t.done);
+
+  const renderList = (items, section) => items.map(todo => `
+    <div class="todo-item${todo.done?' completed':''}" data-id="${todo.id}">
+      <button class="todo-check${todo.done?' checked':''}" data-action="toggle" data-id="${todo.id}">
+        ${todo.done ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>` : ''}
+      </button>
+      <div class="todo-priority" style="background:${PRIORITIES[todo.priority||'medium']}"></div>
+      <span class="todo-text${todo.done?' strike':''}">${todo.text}</span>
+      <button class="todo-delete" data-action="delete" data-id="${todo.id}">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>`).join('');
+
+  root.innerHTML = `
+    <div class="todo-add-row">
+      <input class="todo-input" id="todoInput" placeholder="Add a new task…" />
+      <select id="todoPriority" style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:0 10px;color:var(--text-primary);font-family:var(--font-mono);font-size:12px;cursor:pointer">
+        <option value="high">High</option>
+        <option value="medium" selected>Medium</option>
+        <option value="low">Low</option>
+      </select>
+      <button class="btn-primary" id="addTodoBtn">Add</button>
+    </div>
+
+    <div class="todo-section-label">
+      Active <span class="todo-count-badge">${active.length}</span>
+    </div>
+    <div class="todo-list" id="activeList">
+      ${active.length ? renderList(active) : '<div class="todo-empty">No active tasks 🎉</div>'}
+    </div>
+
+    <div class="todo-section-label" style="margin-top:8px">
+      Completed <span class="todo-count-badge">${completed.length}</span>
+    </div>
+    <div class="todo-list" id="completedList">
+      ${completed.length ? renderList(completed) : '<div class="todo-empty">Nothing completed yet</div>'}
+    </div>`;
+
+  root.querySelector('#addTodoBtn').addEventListener('click', () => {
+    const inp = root.querySelector('#todoInput');
+    const pri = root.querySelector('#todoPriority').value;
+    const txt = inp.value.trim();
+    if (!txt) return;
+    todos.set([...todos.value, { id: Date.now(), text: txt, done: false, priority: pri }]);
+    inp.value = '';
+    renderTodo(root);
+  });
+  root.querySelector('#todoInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') root.querySelector('#addTodoBtn').click();
+  });
+
+  root.querySelectorAll('[data-action]').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = parseInt(el.dataset.id);
+      if (el.dataset.action === 'toggle') {
+        todos.set(todos.value.map(t => t.id===id ? {...t, done:!t.done} : t));
+      } else {
+        todos.set(todos.value.filter(t => t.id !== id));
+      }
+      renderTodo(root);
+    });
+  });
+}
+
+/* ════════════════════════════════════════════
+   STICKY NOTES COMPONENT
+════════════════════════════════════════════ */
+const NOTE_COLORS = ['#fef08a','#bbf7d0','#bfdbfe','#fecaca','#e9d5ff'];
+const NOTE_LABELS = ['Yellow','Green','Blue','Red','Purple'];
+
+function renderNotes(root) {
+  const renderCard = (note) => `
+    <div class="sticky-card" data-id="${note.id}" style="background:${note.color}">
+      <div class="sticky-toolbar">
+        ${NOTE_COLORS.map((c,i) => `
+          <div class="note-swatch${c===note.color?' active':''}" style="background:${c}"
+            title="${NOTE_LABELS[i]}" data-action="color" data-id="${note.id}" data-color="${c}"></div>
+        `).join('')}
+        <button class="note-delete-btn" data-action="delete" data-id="${note.id}">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <textarea class="note-content" placeholder="Type your note…" data-action="edit" data-id="${note.id}">${note.text}</textarea>
+      <div class="note-timestamp">${note.ts}</div>
+    </div>`;
+
+  root.innerHTML = `
+    <div class="notes-header">
+      <div style="font-family:var(--font-display);font-size:15px;font-weight:700">
+        ${notes.value.length} note${notes.value.length!==1?'s':''}
+      </div>
+    </div>
+    <div class="notes-grid" id="notesGrid">
+      <div class="add-note-card" id="addNoteBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Note
+      </div>
+      ${notes.value.map(renderCard).join('')}
+    </div>`;
+
+  root.querySelector('#addNoteBtn').addEventListener('click', () => {
+    const newNote = {
+      id: Date.now(),
+      text: '',
+      color: NOTE_COLORS[Math.floor(Math.random()*NOTE_COLORS.length)],
+      ts: new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}),
+    };
+    notes.set([newNote, ...notes.value]);
+    renderNotes(root);
+    setTimeout(() => root.querySelector(`[data-id="${newNote.id}"] .note-content`)?.focus(), 50);
+  });
+
+  root.querySelectorAll('[data-action]').forEach(el => {
+    const id = parseInt(el.dataset.id);
+    if (el.dataset.action === 'delete') {
+      el.addEventListener('click', () => {
+        notes.set(notes.value.filter(n => n.id !== id));
+        renderNotes(root);
+      });
+    } else if (el.dataset.action === 'color') {
+      el.addEventListener('click', () => {
+        notes.set(notes.value.map(n => n.id===id ? {...n, color: el.dataset.color} : n));
+        renderNotes(root);
+      });
+    } else if (el.dataset.action === 'edit') {
+      el.addEventListener('input', () => {
+        notes.set(notes.value.map(n => n.id===id ? {...n, text: el.value} : n));
+      });
+    }
+  });
+}
+
+/* ════════════════════════════════════════════
+   BOOT
+════════════════════════════════════════════ */
+navigate('overview');
+</script>
+</body>
+</html>
