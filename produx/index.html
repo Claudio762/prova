@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="it" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Produx Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ SIDEBAR (desktop) ══ -->
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <span class="logo-dot"></span>
+        PRODUX
+      </div>
+      <div class="logo-sub">DASHBOARD v2.0</div>
+      <div class="logo-dedication">
+        <span class="ded-heart"></span>
+        <span>Fatto con amore</span>
+      </div>
+    </div>
+    <nav class="nav-section">
+      <div class="nav-label">Area di lavoro</div>
+      <div class="nav-item active" data-view="overview">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Panoramica</span>
+      </div>
+      <div class="nav-item" data-view="calendar">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Calendario</span>
+      </div>
+      <div class="nav-item" data-view="timer">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Timer Focus</span>
+      </div>
+      <div class="nav-item" data-view="todo">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>Attività</span>
+      </div>
+      <div class="nav-item" data-view="notes">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Note</span>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="time-display" id="clock">--:--</div>
+      <button class="toggle-dark on" id="darkToggle"><div class="knob"></div></button>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div id="main">
+    <!-- Topbar desktop -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbarTitle">Panoramica</div>
+        <div class="topbar-meta" id="topbarDate">Caricamento...</div>
+      </div>
+    </div>
+    <!-- Topbar mobile -->
+    <div id="mob-topbar">
+      <div class="mob-logo">
+        <span class="mob-logo-heart"></span>
+        PRODUX
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="mob-page-title" id="mobTitle">Panoramica</div>
+        <button class="toggle-dark on" id="darkToggleMob"><div class="knob"></div></button>
+      </div>
+    </div>
+    <div class="content-area" id="contentArea"></div>
+  </div>
+
+  <!-- ══ BOTTOM NAV (mobile) ══ -->
+  <nav id="mob-nav">
+    <div class="mob-item active" data-view="overview">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Home
+    </div>
+    <div class="mob-item" data-view="calendar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Calendario
+    </div>
+    <div class="mob-item" data-view="timer">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Timer
+    </div>
+    <div class="mob-item" data-view="todo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Attività
+    </div>
+    <div class="mob-item" data-view="notes">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Note
+    </div>
+  </nav>
+
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
